@@ -74,7 +74,7 @@ let cartQuantity = 0;
 document.querySelectorAll('.js-add-to-cart')
   .forEach((button) => {
     button.addEventListener ('click' , () => {
-      const productId = button.dataset.proudctId
+      const productId = button.dataset.productId
       productId;
       addToCart(productId);
       updateCartQuantity();
