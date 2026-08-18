@@ -1,17 +1,17 @@
-import {formatCurrency} from '../scripts/utils/money.js';
+import { formatCurrency } from '../scripts/utils/money.js';
 
 export function getProduct(productId) {
-let matchingProduct;
+  let matchingProduct;
 
-    products.forEach((product) => {
-      if (product.id === productId) {
-        matchingProduct = product;
-      }
-    });
-    return matchingProduct;
+  products.forEach((product) => {
+    if (product.id === productId) {
+      matchingProduct = product;
+    }
+  });
+  return matchingProduct;
 }
 
-class Product{
+class Product {
   id;
   image;
   name;
@@ -27,28 +27,28 @@ class Product{
   }
 
   getStarsUrl() {
-  return `images/ratings/rating-${this.rating.stars * 10}.png`;
+    return `images/ratings/rating-${this.rating.stars * 10}.png`;
   }
 
-  getPrice(){
+  getPrice() {
     return `$${formatCurrency(this.priceCents)}`
   }
 
-  extraInfoHTML(){
-    
+  extraInfoHTML() {
+
     return '';
   }
 }
 
-class Clothing extends Product{
+class Clothing extends Product {
   sizeChartLink;
 
   constructor(productDetails) {
     super(productDetails);
     this.sizeChartLink = productDetails.sizeChartLink;
   }
-  extraInfoHTML(){
-   // super.extraInfoHTML();
+  extraInfoHTML() {
+    // super.extraInfoHTML();
     return `
     <a href="${this.sizeChartLink}" target="_blank">
     Size chart
@@ -83,23 +83,46 @@ const object3 = {
   }
 };
 object3.method();
-*/  
+*/
 export let products = [];
 
- export function loadProducts(fun) {
+export function loadProductsFetch() {
+  const promise = fetch(
+    'https://supersimplebackend.dev/products'
+  ).then((response) => {
+    return response.json();
+  }).then((productsData) => {
+    products = productsData.map((productDetails) => {
+      if (productDetails.type === 'clothing') {
+        return new Clothing(productDetails);
+      }
+      return new Product(productDetails);
+    });
+
+    console.log('load products');
+
+  });
+  return promise;
+}
+/*
+loadProductsFetch().then(() => {
+  console.log('next step')
+});
+*/
+export function loadProducts(fun) {
   const xhr = new XMLHttpRequest();
 
   xhr.addEventListener('load', () => {
-     products = JSON.parse(xhr.response).map((productDetails) => {
-  if (productDetails.type === 'clothing'){
-    return new Clothing(productDetails);
-  }
-  return new Product(productDetails);
-});
+    products = JSON.parse(xhr.response).map((productDetails) => {
+      if (productDetails.type === 'clothing') {
+        return new Clothing(productDetails);
+      }
+      return new Product(productDetails);
+    });
 
-console.log('load products');
+    console.log('load products');
 
-fun();
+    fun();
   });
 
   xhr.open('GET', 'https://supersimplebackend.dev/products');
